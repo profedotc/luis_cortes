@@ -4,8 +4,8 @@
 #include <assert.h>
 
 #define MAX_DIST 1
-#define ROWS 40
-#define COLUMNS 40
+#define ROWS 16
+#define COLUMNS 16
 #define TOROID 0
 
 void gol_init(bool *);
