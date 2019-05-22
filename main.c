@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <assert.h>
+//#include <assert.h>
 
 #define MAX_DIST 1
 #define ROWS 16
