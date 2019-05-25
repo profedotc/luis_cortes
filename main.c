@@ -8,12 +8,11 @@
 #define COLUMNS 16
 #define TOROID 0
 
-void gol_init(bool *);
-void gol_print(bool *);
-void gol_step(bool *, bool *);
-char gol_count_neighbors(bool *, char, char);
-bool gol_get_cell(bool *, char, char);
-void gol_copy(bool *, bool *);
+void gol_init(bool [ROWS][COLUMNS][2]);
+void gol_print(bool [ROWS][COLUMNS][2], bool);
+void gol_step(bool [ROWS][COLUMNS][2], bool);
+char gol_count_neighbors(bool [ROWS][COLUMNS][2], bool, char, char);
+bool gol_get_cell(bool [ROWS][COLUMNS][2], bool, char, char);
 
 bool init[3][3] = {
     {0, 1, 0},
@@ -24,51 +23,50 @@ bool init[3][3] = {
 int main()
 {
 	int i = 0;
-	bool board[ROWS * COLUMNS];
-    bool board_copy[ROWS * COLUMNS];
+	bool board[ROWS][COLUMNS][2], w = 0;
 	gol_init(board);
 	do {
 		printf("\033cIteration %d\n", i++);
-		gol_print(board);
-		gol_step(board, board_copy);
+		gol_print(board, w);
+		gol_step(board, w);
+        w = !w;
 	} while (getchar() != 'q');
 
 	return EXIT_SUCCESS;
 }
 
-void gol_init(bool *board)
+void gol_init(bool board[ROWS][COLUMNS][2])
 {
     char i, j;
     for(i = 0; i < ROWS; i++)
         for(j = 0; j < COLUMNS; j++)
-            board[ROWS * i + j] =(i < 3 && j < 3)?init[i][j]:0;
+            board[i][j][0] =(i < 3 && j < 3)?init[i][j]:0;
 }
 
-void gol_print(bool *board)
+void gol_print(bool board[ROWS][COLUMNS][2], bool w)
 {
    for(char i = 0; i < ROWS; i++){
         for (char j = 0; j < COLUMNS; j++)
-            printf("%c ",(board[ROWS * i + j])?'#':'.');
+            printf("%c ", (board[i][j][w])?'#':'.');
         printf("\n");
 	    }
 }
 
-void gol_step(bool *board, bool *board_copy)
+void gol_step(bool board[ROWS][COLUMNS][2], bool w)
 {
     char cell, neighbors;
-    gol_copy(board, board_copy);
     for(char x = 0; x < ROWS; x++)
         for(char y = 0; y < COLUMNS; y++){
-		    cell = board_copy[ROWS * x + y];
-			neighbors = gol_count_neighbors(board_copy, x, y) - cell;               
+		    cell = board[x][y][w];
+			neighbors = gol_count_neighbors(board, w, x, y) - cell;
             if (cell)
-                board[ROWS * x + y] = (neighbors == 2 || neighbors == 3);
+                board[x][y][!w] = (neighbors == 2 || neighbors == 3);
             else
-                board[ROWS * x + y] = neighbors == 3;
+                board[x][y][!w] = neighbors == 3;
         }
 }
 
-char gol_count_neighbors(bool *board, char x, char y)
+char gol_count_neighbors(bool board[ROWS][COLUMNS][2], bool w, char x, char y)
 {
 	char a, b, in_board;
 	char neighbors = 0;
@@ -77,27 +75,20 @@ char gol_count_neighbors(bool *board, char x, char y)
 	        if (TOROID){
                 a = (((x + k) % ROWS) + ROWS) % ROWS;
                 b = (((y + z) % COLUMNS) + COLUMNS) % COLUMNS;
-                neighbors += board[ROWS * a + b];
+                neighbors += gol_get_cell(board, w, a, b);
             } else {
                 a = x + k;
                 b = y + z;
-                neighbors += gol_get_cell(board, a, b);
+                neighbors += gol_get_cell(board, w, a, b);
            }
 		}
 	return neighbors;
 }
 
-bool gol_get_cell(bool *board, char x, char y)
+bool gol_get_cell(bool board[ROWS][COLUMNS][2], bool w, char x, char y)
 {
 // assert(x >= 0 && x < ROWS && y >= 0 && y < COLUMNS);
 	if ((x >= 0 && x < ROWS && y >= 0 && y < COLUMNS) || TOROID)
-        return board[ROWS * x + y];
+        return board[x][y][w];
     return 0;
-}
-
-void gol_copy(bool *board, bool *board_copy)
-{
-	for(char i = 0; i < ROWS; i++)
-    	for(char j = 0; j < COLUMNS; j++)
-        	board_copy[ROWS * i + j] = board[ROWS * i + j];
 }
