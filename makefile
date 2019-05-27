@@ -5,3 +5,6 @@ mi_prog: main.o
 
 main.o: main.c main.h
 	gcc -c main.c
+
+clear:
+	rm main.o
