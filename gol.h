@@ -1,5 +1,5 @@
-#ifndef _ANOMALIES_H_
-#define _ANOMALIES_H_
+#ifndef _GOL_H_
+#define _GOL_H_
 
 #include <stdbool.h>
 

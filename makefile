@@ -1,10 +1,16 @@
-all: mi_prog
+CC = gcc $(CFLAGS)
+CFLAGS = -Wall -Wextra -std=c99
 
-mi_prog: main.o
-	gcc main.o -o gol
+.PHONY: all test debug release clean
 
-main.o: main.c main.h
-	gcc -c main.c
+all: gol
 
-clear:
-	rm main.o
+gol: gol.o
+	$(CC) gol.o -o gol
+
+gol.o: gol.c gol.h
+	$(CC) -c gol.c
+
+clean:
+	rm gol
+	rm *.o
