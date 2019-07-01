@@ -3,56 +3,62 @@
 #include <stdbool.h>
 #include "gol.h"
 
+static int count_neighbors(struct gol *, int x, int y);
+static bool get_cell(struct gol *, int x, int y);
+
 bool init[3][3] = {
     {0, 1, 0},
     {0, 0, 1},
     {1, 1, 1}
 };
 
-void gol_init(bool board[ROWS][COLS][2])
+void gol_init(struct gol *worlds)
 {
     for(int i = 0; i < ROWS; i++)
         for(int j = 0; j < COLS; j++)
-            board[i][j][0] =(i < 3 && j < 3)?init[i][j]:0;
+            worlds->board[i][j][0] = (i < 3 && j < 3)?init[i][j]:0;
+    worlds->cw = 0;
+    
 }
 
-void gol_print(bool board[ROWS][COLS][2], bool w)
+void gol_print(struct gol *worlds)
 {
+   bool w = worlds->cw;
    for(int i = 0; i < ROWS; i++){
         for (int j = 0; j < COLS; j++)
-            printf("%c ", (board[i][j][w])?'#':'.');
+            printf("%c ", (worlds->board[i][j][w])?'#':'.');
         printf("\n");
         }
 }
 
-void gol_step(bool board[ROWS][COLS][2], bool w)
+void gol_step(struct gol *worlds)
 {
+    bool w = worlds->cw;
     int x, y, cell, neighbors;
     for(x = 0; x < ROWS; x++)
         for(y = 0; y < COLS; y++){
-        cell = board[x][y][w];
-        neighbors = gol_count_neighbors(board, w, x, y) - cell;
+        cell = worlds->board[x][y][w];
+        neighbors = count_neighbors(worlds, x, y) - cell;
             if (cell)
-                board[x][y][!w] = (neighbors == 2 || neighbors == 3);
+                worlds->board[x][y][!w] = (neighbors == 2 || neighbors == 3);
             else
-                board[x][y][!w] = neighbors == 3;
+                worlds->board[x][y][!w] = neighbors == 3;
         }
+    worlds->cw = !worlds->cw;
 }
 
-int gol_count_neighbors(bool board[ROWS][COLS][2], bool w, int x, int y)
+static int count_neighbors(struct gol *worlds, int x, int y)
 {
     int k, z, neighbors = 0;
     for(k = -MAX_DIST; k <= MAX_DIST; k++)
         for(z = -MAX_DIST; z <= MAX_DIST; z++)
-            neighbors += gol_get_cell(board, w, x + k, y + z);
+            neighbors += get_cell(worlds, x + k, y + z);
     return neighbors;
 }
 
-bool gol_get_cell(bool board[ROWS][COLS][2], bool w, int x, int y)
+static bool get_cell(struct gol *worlds, int x, int y)
 {
-    if (TOROID)
-        return board[((x % ROWS) + ROWS) % ROWS][((y % COLS + COLS)) % COLS][w];
-    else if (x >= 0 && x < ROWS && y >= 0 && y < COLS)
-        return board[x][y][w];
+    if (x >= 0 && x < ROWS && y >= 0 && y < COLS)
+        return worlds->board[x][y][worlds->cw];
     return 0;
 }
