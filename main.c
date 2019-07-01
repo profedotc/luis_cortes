@@ -6,13 +6,13 @@
 int main()
 {
     int i = 0;
-    bool board[ROWS][COLS][2], w = 0;
-    gol_init(board);
+    struct gol worlds;
+    struct gol *pw = &worlds;
+    gol_init(pw);
     do {
         printf("\033cIteration %d\n", i++);
-        gol_print(board, w);
-        gol_step(board, w);
-        w = !w;
+        gol_print(pw);
+        gol_step(pw);
     } while (getchar() != 'q');
 
     return EXIT_SUCCESS;
