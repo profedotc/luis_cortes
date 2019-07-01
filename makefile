@@ -5,8 +5,11 @@ CFLAGS = -Wall -Wextra -std=c99
 
 all: gol
 
-gol: gol.o
+gol: gol.o main.o
 	$(CC) gol.o main.c -o gol
+
+main.o: main.c gol.h
+	$(CC) -c main.c
 
 gol.o: gol.c gol.h
 	$(CC) -c gol.c
