@@ -5,7 +5,7 @@
 
 #define MAX_DIST 1
 #define ROWS 16
-#define COLS 16
+#define COLS 24
 
 struct gol {
 	bool board[ROWS][COLS][2];
