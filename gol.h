@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
-#define MAX_DIST 1
 #define ROWS 16
 #define COLS 24
+#define MAX_DIST 1
 
 struct gol {
 	bool board[ROWS][COLS][2];
@@ -15,5 +15,8 @@ struct gol {
 void gol_init(struct gol *);
 void gol_step(struct gol *);
 void gol_print(struct gol *);
+
+struct gol *gol_alloc();
+void gol_free(struct gol *);
 
 #endif

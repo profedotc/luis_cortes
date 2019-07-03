@@ -12,6 +12,18 @@ bool init[3][3] = {
     {1, 1, 1}
 };
 
+struct gol *gol_alloc()
+{
+    return (struct gol *) malloc(sizeof(struct gol));
+}
+
+void gol_free(struct gol *worlds)
+{
+    free(worlds);
+}
+
+
+
 void gol_init(struct gol *worlds)
 {
     for(int i = 0; i < ROWS; i++)
@@ -47,6 +59,7 @@ void gol_step(struct gol *worlds)
     worlds->cw = !worlds->cw;
 }
 
+// Funciones estáticas
 static int count_neighbors(struct gol *worlds, int x, int y)
 {
     int k, z, neighbors = 0;
@@ -62,3 +75,5 @@ static bool get_cell(struct gol *worlds, int x, int y)
         return worlds->board[x][y][worlds->cw];
     return 0;
 }
+
+
