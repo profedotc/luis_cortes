@@ -6,10 +6,10 @@ CFLAGS = -Wall -Wextra -std=c99
 debug: CFLAGS += -g -O0
 debug: gol
 
-release: CFLAGS += -g -O0
+release: CFLAGS += -g -O3
 release: gol
 
-all: gol
+all: debug
 
 gol: gol.o main.o
 	$(CC) gol.o main.c -o gol
