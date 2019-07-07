@@ -3,8 +3,10 @@
 #include <stdbool.h>
 #include "gol.h"
 
-static int count_neighbors(struct gol *, int x, int y);
-static bool get_cell(struct gol *, int x, int y);
+static int count_neighbors(struct gol *, int, int);
+static bool get_cell(struct gol *, int, int);
+static void set_cell(struct gol *, int, int, bool);
+static bool fix_coords(int, int);
 
 bool init[3][3] = {
     {0, 1, 0},
@@ -14,54 +16,45 @@ bool init[3][3] = {
 
 void gol_alloc(struct gol *worlds)
 {
-    worlds->board = (bool ***) malloc(ROWS * sizeof(bool**));
-    for(int i = 0; i < ROWS; i++){
-        worlds->board[i] = (bool **) malloc(COLS * sizeof(bool*));
-        for(int j = 0; j < COLS; j++)
-            worlds->board[i][j] = (bool *) malloc(2 * sizeof(bool));
-    }
+    worlds->board[0] = (bool *) malloc(ROWS * COLS * sizeof(bool));
+    worlds->board[1] = (bool *) malloc(ROWS * COLS * sizeof(bool));
 }
 
 void gol_free(struct gol *worlds)
 {
-    for(int i = 0; i< ROWS; i++){
-        for(int j = 0; j < COLS; j++)
-            free(worlds->board[i][j]);
-	free(worlds->board[i]);
-    }
-    free(worlds->board);
+    free(worlds->board[0]);
+    free(worlds->board[1]);
 }
 
 void gol_init(struct gol *worlds)
 {
     for(int i = 0; i < ROWS; i++)
         for(int j = 0; j < COLS; j++)
-            worlds->board[i][j][0] = (i < 3 && j < 3)?init[i][j]:0;
+            worlds->board[0][i*COLS + j] = (i < 3 && j < 3)?init[i][j]:0;
     worlds->cw = 0;
 }
 
 void gol_print(struct gol *worlds)
 {
-   bool w = worlds->cw;
    for(int i = 0; i < ROWS; i++){
         for (int j = 0; j < COLS; j++)
-            printf("%c ", (worlds->board[i][j][w])?'#':'.');
+            printf("%c ", (get_cell(worlds,i,j))?'#':'.');
         printf("\n");
         }
 }
 
 void gol_step(struct gol *worlds)
 {
-    bool w = worlds->cw;
-    int x, y, cell, neighbors;
-    for(x = 0; x < ROWS; x++)
-        for(y = 0; y < COLS; y++){
-        cell = worlds->board[x][y][w];
+    int cell, neighbors;
+    for(int x = 0; x < ROWS; x++)
+        for(int y = 0; y < COLS; y++){
+        cell = get_cell(worlds,x,y);
         neighbors = count_neighbors(worlds, x, y) - cell;
             if (cell)
-                worlds->board[x][y][!w] = (neighbors == 2 || neighbors == 3);
+                set_cell(worlds, x, y, (neighbors == 2 || 
+                                        neighbors == 3));
             else
-                worlds->board[x][y][!w] = neighbors == 3;
+                set_cell(worlds, x, y, neighbors == 3);
         }
     worlds->cw = !worlds->cw;
 }
@@ -78,9 +71,20 @@ static int count_neighbors(struct gol *worlds, int x, int y)
 
 static bool get_cell(struct gol *worlds, int x, int y)
 {
-    if (x >= 0 && x < ROWS && y >= 0 && y < COLS)
-        return worlds->board[x][y][worlds->cw];
+    if (fix_coords(x,y))
+        return worlds->board[worlds->cw][x * COLS + y];
     return 0;
+}
+
+static void set_cell(struct gol *worlds, int x, int y, bool b)
+{
+    if (fix_coords(x,y))
+        worlds->board[!worlds->cw][x * COLS + y] = b;
+}
+
+static bool fix_coords(int x, int y)
+{
+    return x >= 0 && x < ROWS && y >= 0 && y < COLS;
 }
 
 

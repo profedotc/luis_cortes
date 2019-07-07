@@ -8,7 +8,7 @@
 #define COLS 24
 
 struct gol {
-	bool ***board;
+	bool *board[2];
         int cw; // current_world
 };
 
