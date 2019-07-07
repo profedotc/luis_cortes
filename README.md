@@ -14,8 +14,8 @@ A C compiler, in my case, gcc.
 
 Compiling and running the Conway's Game of Life:
 ```
-gcc main.c -o conway
-./conway
+make
+./gol
 ```
 
 ## Authors
