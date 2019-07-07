@@ -9,7 +9,7 @@
 
 struct gol {
 	bool *board[2];
-        int cw; // current_world
+        bool cw; // current_world
 };
 
 void gol_init(struct gol *);

@@ -3,10 +3,12 @@
 #include <stdbool.h>
 #include "gol.h"
 
-static int count_neighbors(struct gol *, int, int);
 static bool get_cell(struct gol *, int, int);
 static void set_cell(struct gol *, int, int, bool);
-static bool fix_coords(int, int);
+static bool get_cw(struct gol *);
+static void set_cw(struct gol *, bool);
+static int fix_coords(int, int);
+static int count_neighbors(struct gol *, int, int);
 
 bool init[3][3] = {
     {0, 1, 0},
@@ -28,17 +30,18 @@ void gol_free(struct gol *worlds)
 
 void gol_init(struct gol *worlds)
 {
+    set_cw(worlds, 1);
     for(int i = 0; i < ROWS; i++)
         for(int j = 0; j < COLS; j++)
-            worlds->board[0][i*COLS + j] = (i < 3 && j < 3)?init[i][j]:0;
-    worlds->cw = 0;
+            set_cell(worlds,i,j,(i < 3 && j < 3)?init[i][j]:0);
+    set_cw(worlds, 0);
 }
 
 void gol_print(struct gol *worlds)
 {
    for(int i = 0; i < ROWS; i++){
         for (int j = 0; j < COLS; j++)
-            printf("%c ", (get_cell(worlds,i,j))?'#':'.');
+            printf("%c ", get_cell(worlds, i, j)?'#':'.');
         printf("\n");
         }
 }
@@ -51,12 +54,11 @@ void gol_step(struct gol *worlds)
         cell = get_cell(worlds,x,y);
         neighbors = count_neighbors(worlds, x, y) - cell;
             if (cell)
-                set_cell(worlds, x, y, (neighbors == 2 || 
-                                        neighbors == 3));
+                set_cell(worlds, x, y, (neighbors == 2 || neighbors == 3));
             else
                 set_cell(worlds, x, y, neighbors == 3);
         }
-    worlds->cw = !worlds->cw;
+    set_cw(worlds, !get_cw(worlds));
 }
 
 // Funciones estáticas
@@ -71,20 +73,27 @@ static int count_neighbors(struct gol *worlds, int x, int y)
 
 static bool get_cell(struct gol *worlds, int x, int y)
 {
-    if (fix_coords(x,y))
-        return worlds->board[worlds->cw][x * COLS + y];
-    return 0;
+    return worlds->board[worlds->cw][fix_coords(x,y)];
 }
 
 static void set_cell(struct gol *worlds, int x, int y, bool b)
 {
-    if (fix_coords(x,y))
-        worlds->board[!worlds->cw][x * COLS + y] = b;
+    worlds->board[!worlds->cw][fix_coords(x,y)] = b;
 }
 
-static bool fix_coords(int x, int y)
+static int fix_coords(int x, int y)
 {
-    return x >= 0 && x < ROWS && y >= 0 && y < COLS;
+    x = (x % ROWS + ROWS) % ROWS;
+    y = (y % COLS + COLS) % COLS;
+    return  x * COLS + y;
 }
 
+static bool get_cw(struct gol *worlds)
+{
+    return worlds->cw;
+}
 
+static void set_cw(struct gol *worlds, bool b)
+{
+    worlds->cw = b;
+}
