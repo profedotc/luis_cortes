@@ -3,7 +3,13 @@ CFLAGS = -Wall -Wextra -std=c99
 
 .PHONY: all test debug release clean
 
-all: gol
+debug: CFLAGS += -g -O0
+debug: gol
+
+release: CFLAGS += -g -O3
+release: gol
+
+all: debug
 
 gol: gol.o main.o
 	$(CC) gol.o main.c -o gol
