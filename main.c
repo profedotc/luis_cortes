@@ -5,12 +5,11 @@
 
 int main()
 {
-    int i = 0;
-
     struct gol worlds;
     gol_alloc(&worlds);
+    gol_init(&worlds);    
 
-    gol_init(&worlds);
+    int i = 0;
     do {
         printf("\033cIteration %d\n", i++);
         gol_print(&worlds);
